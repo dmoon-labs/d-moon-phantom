@@ -22,6 +22,25 @@ module Phantom
       ENV['PHANTOM_CORE'] || File.join(Phantom::ROOT, 'core', 'target', 'release', 'phantom-core')
     end
 
+    def settings_path
+      File.join(home, 'config.json')
+    end
+
+    def settings
+      data = JSON.parse(File.read(settings_path))
+      data.is_a?(Hash) ? data : {}
+    rescue SystemCallError, JSON::ParserError
+      {}
+    end
+
+    def save_setting(key, value)
+      data = settings
+      data[key] = value
+      tmp = "#{settings_path}.tmp"
+      File.write(tmp, JSON.pretty_generate(data))
+      File.rename(tmp, settings_path)
+    end
+
     def termux?
       ENV['PREFIX'].to_s.include?('com.termux')
     end

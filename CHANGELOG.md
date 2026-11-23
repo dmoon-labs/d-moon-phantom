@@ -2,6 +2,14 @@
 
 All notable changes are documented here. Format: Keep a Changelog; versioning: SemVer.
 
+## [Unreleased]
+
+### Added
+- New README with project banner (`assets/banner.png`), badges, command reference, architecture diagram and an Indonesian section.
+- `phantom art` menu: choose the moon ASCII art (7 braille moons, stored in `$PHANTOM_HOME/config.json`,
+  `PHANTOM_MOON=<n>` overrides for one run). D-MOON and PHANTOM sit beside the moon when the screen is wide
+  enough, otherwise below it; moons wider than the screen are flagged in the menu.
+
 ## [1.0.0] - 2026-11-23
 
 First release of D-MOON PHANTOM.

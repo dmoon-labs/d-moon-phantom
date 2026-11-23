@@ -28,6 +28,10 @@ module Phantom
         report list                  saved reports
         report show <ID>             show a report (--format txt|json|html)
 
+      Appearance
+        art                          choose the moon ASCII art (menu)
+        art list|preview N|set N     list, preview or select a moon
+
       System
         system status                versions, tool counts, verification status
         doctor                       environment diagnostics
@@ -131,6 +135,7 @@ module Phantom
       when 'inspect' then cmd_inspect(args)
       when 'file' then cmd_file(args)
       when 'report' then cmd_report(args)
+      when 'art' then cmd_art(args)
       when 'system' then cmd_system(args)
       when 'doctor' then cmd_doctor
       when 'update' then cmd_update
@@ -461,6 +466,71 @@ module Phantom
     def fail_env(env)
       warn "error [#{env['error']['code']}]: #{env['error']['message']}"
       1
+    end
+
+    # ------------------------------------------------------------ art menu
+    def print_moon_list
+      current = Banner.current_moon
+      cols = Banner.columns
+      Banner.moon_ids.each do |id|
+        width, height = Banner.moon_size(id)
+        marker = id == current ? '*' : ' '
+        fit = width <= cols ? '' : "  (needs #{width} columns; zoom out)"
+        puts format('%s %-2s %-18s %2dx%-2d%s', marker, id, Banner.moon_name(id), width, height, fit)
+      end
+      puts "* = selected. Screen width: #{cols} columns."
+    end
+
+    def valid_moon!(id)
+      raise UsageError, 'missing moon number' if id.nil?
+      raise UsageError, "no such moon '#{id}' (see 'phantom art list')" unless Banner.moon_ids.include?(id)
+
+      id
+    end
+
+    def select_moon(id)
+      Config.save_setting('moon', id)
+      puts "Moon #{id} selected. Preview:"
+      puts
+      Banner.show($stdout, moon: id)
+    end
+
+    def cmd_art(args)
+      case args[0]
+      when nil then art_menu
+      when 'list' then print_moon_list
+      when 'preview'
+        Banner.show($stdout, moon: valid_moon!(args[1]))
+      when 'set'
+        select_moon(valid_moon!(args[1]))
+      else raise UsageError, 'usage: phantom art [list | preview N | set N]'
+      end
+      0
+    end
+
+    def art_menu
+      print_moon_list
+      unless $stdin.tty?
+        puts "Choose with: phantom art set <number>"
+        return
+      end
+      loop do
+        print "\nNumber to select, p<number> to preview, Enter to quit: "
+        $stdout.flush
+        answer = $stdin.gets
+        break if answer.nil? || answer.strip.empty? || answer.strip.downcase == 'q'
+
+        answer = answer.strip
+        if answer =~ /\Ap\s*(\d+)\z/i
+          id = Regexp.last_match(1)
+          Banner.moon_ids.include?(id) ? Banner.show($stdout, moon: id) : puts("No such moon: #{id}")
+        elsif Banner.moon_ids.include?(answer)
+          select_moon(answer)
+          break
+        else
+          puts "Not a valid choice: #{answer}"
+        end
+      end
     end
 
     # ------------------------------------------------------------ system

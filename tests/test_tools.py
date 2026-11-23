@@ -128,19 +128,45 @@ class Protocol(unittest.TestCase):
 
 
 class Branding(unittest.TestCase):
-    def test_logo_has_required_text_and_no_emoji(self):
-        t = open(os.path.join(ROOT, "assets", "logo.txt"), encoding="utf-8").read()
-        for ch in t:
-            if ch == "\n":
-                continue
-            # plain ASCII or Unicode braille patterns (U+2800-U+28FF); never emoji
-            self.assertTrue(ord(ch) < 128 or 0x2800 <= ord(ch) <= 0x28FF, "unexpected character %r" % ch)
-        lines = t.splitlines()
-        self.assertIn("CYBERSECURITY INTELLIGENCE SUITE", [l.strip() for l in lines])
-        beside = [l for l in lines if l.endswith(("D-MOON", "PHANTOM")) and any(0x2800 <= ord(c) <= 0x28FF for c in l)]
-        self.assertEqual(sorted(l.split()[-1] for l in beside), ["D-MOON", "PHANTOM"],
-                         "D-MOON and PHANTOM must sit beside the moon art")
-        self.assertLess(max(len(l) for l in lines), 45, "must fit a phone terminal")
+    ALLOWED_EXTRA = {"\u2729"}   # the star used by one of the moons
+
+    def moons(self):
+        d = os.path.join(ROOT, "assets", "moons")
+        return {f[:-4]: open(os.path.join(d, f), encoding="utf-8").read() for f in os.listdir(d) if f.endswith(".txt")}
+
+    def test_moon_files(self):
+        moons = self.moons()
+        self.assertEqual(sorted(moons, key=int), ["0", "1", "2", "3", "4", "5", "6"])
+        for mid, text in moons.items():
+            with self.subTest(moon=mid):
+                lines = text.splitlines()
+                self.assertGreaterEqual(len(lines), 5)
+                self.assertEqual(len({len(l) for l in lines}), 1, "moon must be a padded rectangle")
+                self.assertLessEqual(len(lines[0]), 60)
+                self.assertTrue(text.strip())
+                for ch in text:
+                    if ch == "\n":
+                        continue
+                    ok = ord(ch) < 128 or 0x2800 <= ord(ch) <= 0x28FF or ch in self.ALLOWED_EXTRA
+                    self.assertTrue(ok, "unexpected character %r (no emoji allowed)" % ch)
+                    self.assertNotEqual(ch, "\u2800", "blank braille must be normalized to a space")
+
+    def test_readme_banner_exists(self):
+        readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+        self.assertIn('src="assets/banner.png"', readme)
+        png = os.path.join(ROOT, "assets", "banner.png")
+        self.assertTrue(os.path.isfile(png))
+        self.assertEqual(open(png, "rb").read(8), b"\x89PNG\r\n\x1a\n")
+        for anchor in ("quick-start", "the-100-tools", "bahasa-indonesia"):
+            self.assertIn('href="#%s"' % anchor, readme)
+
+    def test_banner_text_and_menu_are_wired(self):
+        src = open(os.path.join(ROOT, "lib", "phantom", "banner.rb"), encoding="utf-8").read()
+        for needle in ("D-MOON", "PHANTOM", "CYBERSECURITY INTELLIGENCE SUITE"):
+            self.assertIn("'%s'" % needle, src)
+        cli = open(os.path.join(ROOT, "lib", "phantom", "cli.rb"), encoding="utf-8").read()
+        for needle in ("cmd_art", "art_menu", "save_setting"):
+            self.assertIn(needle, cli + open(os.path.join(ROOT, "lib", "phantom", "config.rb")).read())
 
 
 if __name__ == "__main__":
