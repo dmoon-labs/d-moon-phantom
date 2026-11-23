@@ -128,12 +128,19 @@ class Protocol(unittest.TestCase):
 
 
 class Branding(unittest.TestCase):
-    def test_logo_is_ascii_and_has_required_text(self):
+    def test_logo_has_required_text_and_no_emoji(self):
         t = open(os.path.join(ROOT, "assets", "logo.txt"), encoding="utf-8").read()
-        self.assertTrue(all(ord(c) < 128 for c in t), "logo must be plain ASCII (no emoji)")
-        for line in ("D-MOON", "PHANTOM", "CYBERSECURITY INTELLIGENCE SUITE"):
-            self.assertIn(line, t.splitlines())
-        self.assertLess(max(len(l) for l in t.splitlines()), 50)
+        for ch in t:
+            if ch == "\n":
+                continue
+            # plain ASCII or Unicode braille patterns (U+2800-U+28FF); never emoji
+            self.assertTrue(ord(ch) < 128 or 0x2800 <= ord(ch) <= 0x28FF, "unexpected character %r" % ch)
+        lines = t.splitlines()
+        self.assertIn("CYBERSECURITY INTELLIGENCE SUITE", [l.strip() for l in lines])
+        beside = [l for l in lines if l.endswith(("D-MOON", "PHANTOM")) and any(0x2800 <= ord(c) <= 0x28FF for c in l)]
+        self.assertEqual(sorted(l.split()[-1] for l in beside), ["D-MOON", "PHANTOM"],
+                         "D-MOON and PHANTOM must sit beside the moon art")
+        self.assertLess(max(len(l) for l in lines), 45, "must fit a phone terminal")
 
 
 if __name__ == "__main__":

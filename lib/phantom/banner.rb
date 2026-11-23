@@ -1,5 +1,5 @@
 module Phantom
-  # Crescent moon + D-MOON branding. The moon is plain ASCII (assets/logo.txt).
+  # Moon art + D-MOON branding, read from assets/logo.txt.
   module Banner
     PURPLE = '38;5;97'.freeze
     SILVER = '38;5;250'.freeze
@@ -16,18 +16,21 @@ module Phantom
     end
 
     def logo_lines
-      File.read(File.join(Phantom::ROOT, 'assets', 'logo.txt')).lines.map(&:chomp)
+      File.read(File.join(Phantom::ROOT, 'assets', 'logo.txt'), encoding: 'UTF-8').lines.map(&:chomp)
     rescue SystemCallError
       ['D-MOON', 'PHANTOM', 'CYBERSECURITY INTELLIGENCE SUITE']
     end
 
-    def render(io = $stdout, width = 40)
+    # The moon is Unicode braille art; D-MOON and PHANTOM sit beside it on the
+    # same lines, the subtitle below. Colors are applied per segment.
+    def render(io = $stdout)
       logo_lines.map do |line|
-        case line
-        when 'D-MOON' then paint(WHITE, line.center(width), io)
-        when 'PHANTOM' then paint(SILVER, line.center(width), io)
-        when 'CYBERSECURITY INTELLIGENCE SUITE' then paint(PURPLE, line.center(width), io)
-        else paint(PURPLE, line, io)
+        match = line.match(/\A(.*?)(D-MOON|PHANTOM)\z/)
+        if match
+          word_color = match[2] == 'D-MOON' ? WHITE : SILVER
+          paint(PURPLE, match[1], io) + paint(word_color, match[2], io)
+        else
+          paint(PURPLE, line, io)
         end
       end.join("\n")
     end
