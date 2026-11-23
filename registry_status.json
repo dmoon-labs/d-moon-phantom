@@ -1,0 +1,50 @@
+{
+ "version": "1.0.0",
+ "generated_at": "2026-11-23T04:42:53.142440+00:00",
+ "implemented": 100,
+ "tested": 100,
+ "documented": 100,
+ "per_category": {
+  "URL": 15,
+  "DOM": 12,
+  "DNS": 10,
+  "TLS": 10,
+  "HTP": 12,
+  "NET": 12,
+  "FIL": 10,
+  "EML": 8,
+  "INT": 6,
+  "RPT": 5
+ },
+ "gates": {
+  "catalog: >=100 tools, category counts match": "PASS",
+  "registry: every tool has description/schemas": "PASS",
+  "tests: every tool has passing cases": "PASS",
+  "tests: unittest suite (validation, CLI protocol, safety)": "PASS",
+  "docs: catalog is current and release documents exist": "PASS",
+  "ruby: syntax check (ruby -c)": "PASS",
+  "ruby: CLI starts (phantom --version)": "PASS",
+  "ruby+python: CLI end-to-end (scan url)": "PASS",
+  "rust: cargo test": "PASS",
+  "platform: ARM64 run": "PASS",
+  "security: static review (no shell/eval/unsafe; network tools gated)": "PASS",
+  "resources: peak RSS < 400 MB and all tool cases < 120 s": "PASS"
+ },
+ "gate_notes": {
+  "catalog: >=100 tools, category counts match": "100 tools",
+  "registry: every tool has description/schemas": "",
+  "tests: every tool has passing cases": "100/100 tools",
+  "tests: unittest suite (validation, CLI protocol, safety)": "OK",
+  "docs: catalog is current and release documents exist": "",
+  "ruby: syntax check (ruby -c)": "",
+  "ruby: CLI starts (phantom --version)": "",
+  "ruby+python: CLI end-to-end (scan url)": "",
+  "rust: cargo test": "running 4 tests\n....\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+  "platform: ARM64 run": "executed on aarch64 with Python 3.14.10",
+  "security: static review (no shell/eval/unsafe; network tools gated)": "network tools: dns.query, http.fetch, net.tcp_probe, tls.live_handshake",
+  "resources: peak RSS < 400 MB and all tool cases < 120 s": "peak 106 MB, cases took 2.0 s"
+ },
+ "stable": true,
+ "machine": "aarch64",
+ "python": "3.14.10"
+}

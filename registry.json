@@ -1,0 +1,2607 @@
+{
+ "version": "1.0.0",
+ "tools": [
+  {
+   "id": "DNS-001",
+   "name": "dns.query",
+   "category": "DNS Analysis",
+   "description": "Query one record type from a DNS server (UDP, TCP fallback). Network tool: needs authorized=true.",
+   "language": "python",
+   "input_schema": {
+    "name": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "rtype": {
+     "type": "str",
+     "required": false,
+     "default": "A"
+    },
+    "server": {
+     "type": "str",
+     "required": false,
+     "default": "1.1.1.1"
+    },
+    "port": {
+     "type": "int",
+     "required": false,
+     "default": 53
+    },
+    "timeout": {
+     "type": "int",
+     "required": false,
+     "default": 5
+    }
+   },
+   "output_schema": [
+    "rcode",
+    "answers",
+    "authority",
+    "server",
+    "elapsed_ms",
+    "retried_over_tcp"
+   ],
+   "permission": "network",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-002",
+   "name": "dns.packet_decode",
+   "category": "DNS Analysis",
+   "description": "Decode a raw DNS response given as hex (offline), including compressed names.",
+   "language": "python",
+   "input_schema": {
+    "hex": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "rcode",
+    "questions",
+    "answers",
+    "authority",
+    "additional",
+    "truncated"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-003",
+   "name": "dns.zone_parse",
+   "category": "DNS Analysis",
+   "description": "Parse zone-file text (BIND style, $ORIGIN/$TTL, parentheses) into records.",
+   "language": "python",
+   "input_schema": {
+    "text": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "origin": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "records",
+    "count",
+    "by_type",
+    "warnings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-004",
+   "name": "dns.spf_analyze",
+   "category": "DNS Analysis",
+   "description": "Analyze an SPF TXT record: qualifiers, +all, lookup count (limit 10), ptr, broad ip4 ranges.",
+   "language": "python",
+   "input_schema": {
+    "record": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "valid",
+    "mechanisms",
+    "lookup_mechanisms",
+    "all_qualifier",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-005",
+   "name": "dns.dmarc_analyze",
+   "category": "DNS Analysis",
+   "description": "Analyze a DMARC TXT record: policy strength, pct, subdomain policy, reporting URIs, alignment.",
+   "language": "python",
+   "input_schema": {
+    "record": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "valid",
+    "tags",
+    "policy",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-006",
+   "name": "dns.dkim_analyze",
+   "category": "DNS Analysis",
+   "description": "Analyze a DKIM selector TXT record: key type, RSA key size, revoked key, testing flag, hash algorithms.",
+   "language": "python",
+   "input_schema": {
+    "record": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "valid",
+    "key_type",
+    "key_bits",
+    "revoked",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-007",
+   "name": "dns.caa_analyze",
+   "category": "DNS Analysis",
+   "description": "Analyze CAA records (e.g. '0 issue \"letsencrypt.org\"'): who may issue, wildcard, iodef, critical flag.",
+   "language": "python",
+   "input_schema": {
+    "records": {
+     "type": "list",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "parsed",
+    "issuers",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-008",
+   "name": "dns.mx_analyze",
+   "category": "DNS Analysis",
+   "description": "Analyze MX records ('10 mail.example.com.'): null MX, redundancy, IP-literal targets, priority ties.",
+   "language": "python",
+   "input_schema": {
+    "records": {
+     "type": "list",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "parsed",
+    "null_mx",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-009",
+   "name": "dns.ttl_analyze",
+   "category": "DNS Analysis",
+   "description": "Review record TTLs for very low/high values and fast-flux-like patterns. records: [{name,type,ttl,data}].",
+   "language": "python",
+   "input_schema": {
+    "records": {
+     "type": "list",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "stats",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DNS-010",
+   "name": "dns.takeover_hint",
+   "category": "DNS Analysis",
+   "description": "Flag CNAMEs pointing at third-party hosting that is commonly claimable; combine with targets you know are NXDOMAIN.",
+   "language": "python",
+   "input_schema": {
+    "cnames": {
+     "type": "list",
+     "required": true,
+     "default": null
+    },
+    "nxdomain_targets": {
+     "type": "list",
+     "required": false,
+     "default": []
+    }
+   },
+   "output_schema": [
+    "checked",
+    "candidates",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-001",
+   "name": "domain.validate",
+   "category": "Domain Intelligence",
+   "description": "Validate hostname syntax (RFC 1035/1123 limits) and return its punycode form.",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "valid",
+    "reasons",
+    "ascii"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-002",
+   "name": "domain.split",
+   "category": "Domain Intelligence",
+   "description": "Split a hostname into subdomain, second-level label, suffix and registrable domain (built-in suffix subset).",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "subdomain",
+    "sld",
+    "suffix",
+    "registrable",
+    "note"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-003",
+   "name": "domain.idn_codec",
+   "category": "Domain Intelligence",
+   "description": "Convert a domain between Unicode and punycode and report scripts used.",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "mode": {
+     "type": "str",
+     "required": false,
+     "default": "auto"
+    }
+   },
+   "output_schema": [
+    "ascii",
+    "unicode",
+    "scripts",
+    "mixed_script"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-004",
+   "name": "domain.dga_score",
+   "category": "Domain Intelligence",
+   "description": "Estimate whether the second-level label looks algorithmically generated (heuristic, 0-100).",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "score",
+    "label",
+    "reasons",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-005",
+   "name": "domain.typosquat_variants",
+   "category": "Domain Intelligence",
+   "description": "Generate likely typosquat/lookalike variants of YOUR domain for defensive monitoring (no lookups performed).",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "limit": {
+     "type": "int",
+     "required": false,
+     "default": 300
+    }
+   },
+   "output_schema": [
+    "variants",
+    "count",
+    "truncated"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-006",
+   "name": "domain.similarity",
+   "category": "Domain Intelligence",
+   "description": "Compare two domains: edit distance, folded-skeleton equality, same label with different TLD.",
+   "language": "python",
+   "input_schema": {
+    "a": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "b": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "edit_distance",
+    "similarity",
+    "skeleton_equal",
+    "same_label_other_tld",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-007",
+   "name": "domain.tld_profile",
+   "category": "Domain Intelligence",
+   "description": "Classify the TLD (country-code, generic, sponsored) and note whether it is abuse-heavy.",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "tld",
+    "type",
+    "abuse_heavy",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-008",
+   "name": "domain.whois_parse",
+   "category": "Domain Intelligence",
+   "description": "Parse raw WHOIS text you supply: registrar, dates, nameservers, status; flag newly registered or expiring domains.",
+   "language": "python",
+   "input_schema": {
+    "text": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "now": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "registrar",
+    "created",
+    "expires",
+    "updated",
+    "age_days",
+    "days_to_expiry",
+    "nameservers",
+    "status",
+    "privacy_proxy",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-009",
+   "name": "domain.lexical_profile",
+   "category": "Domain Intelligence",
+   "description": "Raw lexical features of the domain label: length, digits, vowels, consonant runs, hyphens, entropy.",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "label",
+    "features",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-010",
+   "name": "domain.subdomain_extract",
+   "category": "Domain Intelligence",
+   "description": "Extract subdomains of a target domain from any text (logs, CT exports) and flag exposure-prone names.",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "text": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "subdomains",
+    "count",
+    "interesting",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-011",
+   "name": "domain.disposable_check",
+   "category": "Domain Intelligence",
+   "description": "Check whether an email/domain belongs to a built-in list of disposable-mail providers.",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "disposable",
+    "registrable",
+    "list_size",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "DOM-012",
+   "name": "domain.risk_score",
+   "category": "Domain Intelligence",
+   "description": "Combine syntax, DGA, lexical, TLD and brand-lookalike checks into a 0-100 domain risk score (heuristic).",
+   "language": "python",
+   "input_schema": {
+    "domain": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "score",
+    "label",
+    "findings",
+    "disclaimer"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "EML-001",
+   "name": "email.address_validate",
+   "category": "Email Security Analysis",
+   "description": "Validate an email address (length limits, domain syntax, IDN) and flag disposable providers.",
+   "language": "python",
+   "input_schema": {
+    "address": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "valid",
+    "local",
+    "domain",
+    "normalized",
+    "issues",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "EML-002",
+   "name": "email.header_parse",
+   "category": "Email Security Analysis",
+   "description": "Parse raw email headers: decoded From/To/Subject/Date, Message-ID, Return-Path, Reply-To, hop count; flag missing basics.",
+   "language": "python",
+   "input_schema": {
+    "raw": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "from",
+    "to",
+    "subject",
+    "date",
+    "message_id",
+    "return_path",
+    "reply_to",
+    "received_count",
+    "auth_results",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "EML-003",
+   "name": "email.auth_results",
+   "category": "Email Security Analysis",
+   "description": "Parse Authentication-Results (spf/dkim/dmarc/arc) and flag failures or missing mechanisms.",
+   "language": "python",
+   "input_schema": {
+    "raw": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "results",
+    "domains",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "EML-004",
+   "name": "email.received_chain",
+   "category": "Email Security Analysis",
+   "description": "Analyze Received headers: hops, per-hop delay, out-of-order timestamps, long delays, hop count.",
+   "language": "python",
+   "input_schema": {
+    "raw": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "hops",
+    "total_delay_seconds",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "EML-005",
+   "name": "email.sender_mismatch",
+   "category": "Email Security Analysis",
+   "description": "Compare From, Return-Path and Reply-To domains and check display names that impersonate a brand or another address.",
+   "language": "python",
+   "input_schema": {
+    "raw": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "from_address",
+    "from_domain",
+    "return_path_domain",
+    "reply_to_domain",
+    "display_name",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "EML-006",
+   "name": "email.link_analyze",
+   "category": "Email Security Analysis",
+   "description": "Extract links from an HTML/text email body, compare visible text with the real target, and score each URL (never visited).",
+   "language": "python",
+   "input_schema": {
+    "body": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "links",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "EML-007",
+   "name": "email.attachment_risk",
+   "category": "Email Security Analysis",
+   "description": "Rate attachment file names (and optional content types) for dangerous extensions, double extensions and macro formats.",
+   "language": "python",
+   "input_schema": {
+    "filenames": {
+     "type": "list",
+     "required": true,
+     "default": null
+    },
+    "content_types": {
+     "type": "list",
+     "required": false,
+     "default": []
+    }
+   },
+   "output_schema": [
+    "attachments",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "EML-008",
+   "name": "email.content_score",
+   "category": "Email Security Analysis",
+   "description": "Score email text for phishing language: urgency, credential requests, payment pressure, shouting, generic greeting (English + Indonesian).",
+   "language": "python",
+   "input_schema": {
+    "subject": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "body": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "score",
+    "label",
+    "signals",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-001",
+   "name": "file.hash",
+   "category": "File Security Analysis",
+   "description": "Compute MD5, SHA-1, SHA-256 and SHA-512 of a file (streamed) for lookup or integrity checks.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "algorithms": {
+     "type": "list",
+     "required": false,
+     "default": []
+    }
+   },
+   "output_schema": [
+    "size",
+    "hashes"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-002",
+   "name": "file.type_detect",
+   "category": "File Security Analysis",
+   "description": "Identify the real file type from magic bytes instead of trusting the extension.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "type",
+    "mime",
+    "category",
+    "size"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-003",
+   "name": "file.extension_check",
+   "category": "File Security Analysis",
+   "description": "Compare the declared extension with the real type; detect double extensions, RTLO and executable disguises.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "extension",
+    "detected_type",
+    "detected_category",
+    "mismatch",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-004",
+   "name": "file.entropy",
+   "category": "File Security Analysis",
+   "description": "Shannon entropy of the whole file and per 4 KiB block (sampled for big files); high entropy suggests packing or encryption.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "block_size": {
+     "type": "int",
+     "required": false,
+     "default": 4096
+    }
+   },
+   "output_schema": [
+    "size",
+    "entropy",
+    "block_max",
+    "block_avg",
+    "high_entropy_ratio",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-005",
+   "name": "file.strings",
+   "category": "File Security Analysis",
+   "description": "Extract printable ASCII and UTF-16LE strings and report which suspicious command/API names appear.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "min_length": {
+     "type": "int",
+     "required": false,
+     "default": 6
+    },
+    "limit": {
+     "type": "int",
+     "required": false,
+     "default": 500
+    }
+   },
+   "output_schema": [
+    "ascii_count",
+    "utf16_count",
+    "sample",
+    "suspicious",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-006",
+   "name": "file.ioc_extract",
+   "category": "File Security Analysis",
+   "description": "Extract indicators from a file: URLs, IPv4s, domains, emails, MD5/SHA1/SHA256 hashes and CVE IDs (optionally defanged).",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "defanged": {
+     "type": "bool",
+     "required": false,
+     "default": false
+    }
+   },
+   "output_schema": [
+    "urls",
+    "ips",
+    "domains",
+    "emails",
+    "hashes",
+    "cves",
+    "counts"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-007",
+   "name": "file.pe_analyze",
+   "category": "File Security Analysis",
+   "description": "Parse a Windows PE header: machine, sections with entropy, ASLR/DEP/CFG flags, W+X sections, timestamp anomalies.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "machine",
+    "is_dll",
+    "sections",
+    "aslr",
+    "dep",
+    "cfg",
+    "timestamp",
+    "entry_rva",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-008",
+   "name": "file.elf_analyze",
+   "category": "File Security Analysis",
+   "description": "Parse an ELF header: class, endianness, type, machine, PIE, executable stack and RELRO protections.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "bits",
+    "endian",
+    "type",
+    "machine",
+    "pie",
+    "nx_stack",
+    "relro",
+    "interpreter",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-009",
+   "name": "file.archive_inspect",
+   "category": "File Security Analysis",
+   "description": "List a ZIP/TAR archive WITHOUT extracting: zip-bomb ratio, path traversal, symlinks, encrypted entries, executables inside.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "format",
+    "entries",
+    "total_uncompressed",
+    "ratio",
+    "encrypted",
+    "suspicious_names",
+    "executables",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "FIL-010",
+   "name": "file.document_indicators",
+   "category": "File Security Analysis",
+   "description": "Count risky features in PDF, OOXML, RTF and legacy OLE documents (JavaScript, auto-open, macros, external templates, embedded objects).",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "format",
+    "indicators",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-001",
+   "name": "http.headers_audit",
+   "category": "HTTP Security Analysis",
+   "description": "Audit all security headers of a response (HSTS, CSP, framing, nosniff, referrer, permissions, cookies, CORS, disclosure, cache) and grade A-F.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "https": {
+     "type": "bool",
+     "required": false,
+     "default": true
+    },
+    "sensitive": {
+     "type": "bool",
+     "required": false,
+     "default": false
+    },
+    "origin": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "grade",
+    "score",
+    "findings",
+    "headers_seen"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-002",
+   "name": "http.hsts_check",
+   "category": "HTTP Security Analysis",
+   "description": "Check Strict-Transport-Security max-age, includeSubDomains and preload eligibility.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "https": {
+     "type": "bool",
+     "required": false,
+     "default": true
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-003",
+   "name": "http.csp_analyze",
+   "category": "HTTP Security Analysis",
+   "description": "Analyze Content-Security-Policy for unsafe-inline/eval, wildcards and missing base-uri/object-src/frame-ancestors.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-004",
+   "name": "http.framing_check",
+   "category": "HTTP Security Analysis",
+   "description": "Check clickjacking protection via X-Frame-Options and CSP frame-ancestors.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-005",
+   "name": "http.content_type_check",
+   "category": "HTTP Security Analysis",
+   "description": "Check X-Content-Type-Options nosniff and Content-Type/charset.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-006",
+   "name": "http.referrer_policy_check",
+   "category": "HTTP Security Analysis",
+   "description": "Evaluate the Referrer-Policy value for URL leakage.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-007",
+   "name": "http.permissions_policy_check",
+   "category": "HTTP Security Analysis",
+   "description": "Check Permissions-Policy presence and over-broad feature grants.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-008",
+   "name": "http.cookie_audit",
+   "category": "HTTP Security Analysis",
+   "description": "Audit every Set-Cookie: Secure, HttpOnly, SameSite, __Host-/__Secure- rules, lifetime.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-009",
+   "name": "http.cors_check",
+   "category": "HTTP Security Analysis",
+   "description": "Check CORS headers for wildcard+credentials, null origin, reflected origin and missing Vary.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "origin": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-010",
+   "name": "http.disclosure_check",
+   "category": "HTTP Security Analysis",
+   "description": "Find version/technology disclosure and debug headers (Server, X-Powered-By, ...).",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-011",
+   "name": "http.cache_check",
+   "category": "HTTP Security Analysis",
+   "description": "Check Cache-Control for sensitive responses and cookie+public combinations.",
+   "language": "python",
+   "input_schema": {
+    "headers": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "sensitive": {
+     "type": "bool",
+     "required": false,
+     "default": false
+    }
+   },
+   "output_schema": [
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "HTP-012",
+   "name": "http.fetch",
+   "category": "HTTP Security Analysis",
+   "description": "Fetch response headers (HEAD by default) with optional bounded redirect following. Network tool: authorized=true.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "method": {
+     "type": "str",
+     "required": false,
+     "default": "HEAD"
+    },
+    "follow": {
+     "type": "bool",
+     "required": false,
+     "default": false
+    },
+    "max_redirects": {
+     "type": "int",
+     "required": false,
+     "default": 3
+    },
+    "timeout": {
+     "type": "int",
+     "required": false,
+     "default": 5
+    },
+    "verify_tls": {
+     "type": "bool",
+     "required": false,
+     "default": true
+    },
+    "max_body": {
+     "type": "int",
+     "required": false,
+     "default": 0
+    }
+   },
+   "output_schema": [
+    "status",
+    "final_url",
+    "headers_text",
+    "chain",
+    "body_bytes_read",
+    "tls_verified"
+   ],
+   "permission": "network",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "INT-001",
+   "name": "intel.ioc_classify",
+   "category": "Threat Intelligence",
+   "description": "Detect the type of each indicator (IPv4/IPv6/domain/URL/hash/email/CVE), accepting defanged input.",
+   "language": "python",
+   "input_schema": {
+    "iocs": {
+     "type": "list",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "classified",
+    "counts"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "INT-002",
+   "name": "intel.defang_refang",
+   "category": "Threat Intelligence",
+   "description": "Defang indicators for safe sharing (hxxp, [.]) or restore them to normal form.",
+   "language": "python",
+   "input_schema": {
+    "text": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "mode": {
+     "type": "str",
+     "required": false,
+     "default": "defang"
+    }
+   },
+   "output_schema": [
+    "result",
+    "changed"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "INT-003",
+   "name": "intel.feed_import",
+   "category": "Threat Intelligence",
+   "description": "Import a local IOC list (lines: ioc[,label[,source]]) into PHANTOM's local feed store under a name you choose.",
+   "language": "python",
+   "input_schema": {
+    "path": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "name": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "name",
+    "count",
+    "types",
+    "stored_at"
+   ],
+   "permission": "file-write",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "INT-004",
+   "name": "intel.feed_lookup",
+   "category": "Threat Intelligence",
+   "description": "Look up indicators in your imported feeds. A match is a fact about YOUR feed, not an independent verdict.",
+   "language": "python",
+   "input_schema": {
+    "iocs": {
+     "type": "list",
+     "required": true,
+     "default": null
+    },
+    "feed": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "matches",
+    "checked",
+    "feeds_searched",
+    "findings"
+   ],
+   "permission": "file-read",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "INT-005",
+   "name": "intel.cvss_calc",
+   "category": "Threat Intelligence",
+   "description": "Compute the CVSS v3.0/v3.1 base score and severity from a vector string.",
+   "language": "python",
+   "input_schema": {
+    "vector": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "base_score",
+    "severity",
+    "impact",
+    "exploitability",
+    "metrics"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "INT-006",
+   "name": "intel.attack_map",
+   "category": "Threat Intelligence",
+   "description": "Map free-text observations to candidate MITRE ATT&CK technique IDs using a built-in keyword table (heuristic leads, verify manually).",
+   "language": "python",
+   "input_schema": {
+    "text": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "techniques",
+    "count",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-001",
+   "name": "ip.classify",
+   "category": "IP & Network Intelligence",
+   "description": "Classify an IP: version, private/loopback/link-local/multicast/reserved/CGNAT/global, decode obfuscated notation.",
+   "language": "python",
+   "input_schema": {
+    "ip": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "ip",
+    "version",
+    "scope",
+    "is_global",
+    "obfuscated",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-002",
+   "name": "ip.cidr_calc",
+   "category": "IP & Network Intelligence",
+   "description": "Network math for a CIDR: network, mask, broadcast, host range, address count.",
+   "language": "python",
+   "input_schema": {
+    "cidr": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "network",
+    "netmask",
+    "broadcast",
+    "first_host",
+    "last_host",
+    "num_addresses",
+    "prefixlen",
+    "version"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-003",
+   "name": "ip.range_match",
+   "category": "IP & Network Intelligence",
+   "description": "Check which of your CIDR ranges contain an IP (most specific first).",
+   "language": "python",
+   "input_schema": {
+    "ip": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "cidrs": {
+     "type": "list",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "matches",
+    "matched"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-004",
+   "name": "ip.reverse_pointer",
+   "category": "IP & Network Intelligence",
+   "description": "IP to reverse-DNS name (in-addr.arpa / ip6.arpa) and back.",
+   "language": "python",
+   "input_schema": {
+    "value": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "direction",
+    "result"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-005",
+   "name": "ip.prefix_lookup",
+   "category": "IP & Network Intelligence",
+   "description": "Longest-prefix match of an IP against a prefix table you supply (CSV: cidr,asn,org). Offline; no bundled data.",
+   "language": "python",
+   "input_schema": {
+    "ip": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "table": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "matched",
+    "prefix",
+    "asn",
+    "org",
+    "rows_loaded"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-006",
+   "name": "ip.blocklist_match",
+   "category": "IP & Network Intelligence",
+   "description": "Match IPs against a local blocklist (one IP/CIDR per line, # comments). The result is a local-list match, not live reputation.",
+   "language": "python",
+   "input_schema": {
+    "ips": {
+     "type": "list",
+     "required": true,
+     "default": null
+    },
+    "blocklist": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "hits",
+    "checked",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-007",
+   "name": "net.port_map",
+   "category": "IP & Network Intelligence",
+   "description": "Map port numbers to services and rate the risk of exposing them to the Internet.",
+   "language": "python",
+   "input_schema": {
+    "ports": {
+     "type": "list",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "ports",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-008",
+   "name": "net.tcp_probe",
+   "category": "IP & Network Intelligence",
+   "description": "TCP connect check (no payload) for up to 20 ports on a host you are authorized to test. Network tool: authorized=true.",
+   "language": "python",
+   "input_schema": {
+    "host": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "ports": {
+     "type": "list",
+     "required": true,
+     "default": null
+    },
+    "timeout": {
+     "type": "int",
+     "required": false,
+     "default": 3
+    }
+   },
+   "output_schema": [
+    "host",
+    "results",
+    "open_ports",
+    "findings"
+   ],
+   "permission": "network",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-009",
+   "name": "net.banner_parse",
+   "category": "IP & Network Intelligence",
+   "description": "Extract product/version from a service banner and flag known end-of-life branches (verify with vendor advisories).",
+   "language": "python",
+   "input_schema": {
+    "banner": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "products",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-010",
+   "name": "ip.cidr_summarize",
+   "category": "IP & Network Intelligence",
+   "description": "Collapse a list of IPs/CIDRs into the minimal set of CIDR blocks.",
+   "language": "python",
+   "input_schema": {
+    "items": {
+     "type": "list",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "summary",
+    "input_count",
+    "output_count"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-011",
+   "name": "net.log_ip_extract",
+   "category": "IP & Network Intelligence",
+   "description": "Extract IPs from log text, count them, rank the top talkers and classify scope.",
+   "language": "python",
+   "input_schema": {
+    "text": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "top": {
+     "type": "int",
+     "required": false,
+     "default": 10
+    }
+   },
+   "output_schema": [
+    "unique",
+    "total",
+    "top",
+    "by_scope"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "NET-012",
+   "name": "net.request_burst_detect",
+   "category": "IP & Network Intelligence",
+   "description": "Find IPs that exceed N requests inside a time window in access-log text (defensive anomaly detection).",
+   "language": "python",
+   "input_schema": {
+    "text": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "threshold": {
+     "type": "int",
+     "required": false,
+     "default": 100
+    },
+    "window_seconds": {
+     "type": "int",
+     "required": false,
+     "default": 60
+    }
+   },
+   "output_schema": [
+    "offenders",
+    "lines_parsed",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "RPT-001",
+   "name": "report.build",
+   "category": "Security Reporting",
+   "description": "Assemble tool results into one report (severity totals, tool list, disclaimer) and optionally save it locally.",
+   "language": "python",
+   "input_schema": {
+    "title": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "results": {
+     "type": "list",
+     "required": true,
+     "default": null
+    },
+    "target": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "save": {
+     "type": "bool",
+     "required": false,
+     "default": true
+    }
+   },
+   "output_schema": [
+    "id",
+    "title",
+    "created",
+    "summary",
+    "findings",
+    "tools",
+    "saved_to",
+    "disclaimer"
+   ],
+   "permission": "file-write",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "RPT-002",
+   "name": "report.render_txt",
+   "category": "Security Reporting",
+   "description": "Render a report object as plain text.",
+   "language": "python",
+   "input_schema": {
+    "report": {
+     "type": "dict",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "text"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "RPT-003",
+   "name": "report.render_html",
+   "category": "Security Reporting",
+   "description": "Render a report as a self-contained dark HTML page (all values escaped, no scripts, no external resources).",
+   "language": "python",
+   "input_schema": {
+    "report": {
+     "type": "dict",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "html",
+    "bytes"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "RPT-004",
+   "name": "report.list",
+   "category": "Security Reporting",
+   "description": "List saved reports (newest first) with severity totals.",
+   "language": "python",
+   "input_schema": {
+    "limit": {
+     "type": "int",
+     "required": false,
+     "default": 20
+    }
+   },
+   "output_schema": [
+    "reports",
+    "total"
+   ],
+   "permission": "file-read",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "RPT-005",
+   "name": "report.show",
+   "category": "Security Reporting",
+   "description": "Load a saved report by ID and return it as JSON, text or HTML.",
+   "language": "python",
+   "input_schema": {
+    "id": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "format": {
+     "type": "str",
+     "required": false,
+     "default": "json"
+    }
+   },
+   "output_schema": [
+    "report",
+    "rendered"
+   ],
+   "permission": "file-read",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-001",
+   "name": "tls.cert_parse",
+   "category": "TLS & SSL Inspection",
+   "description": "Parse a PEM X.509 certificate: subject, issuer, validity, SAN, key, signature algorithm.",
+   "language": "python",
+   "input_schema": {
+    "pem": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "path": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "subject",
+    "issuer",
+    "not_before",
+    "not_after",
+    "san",
+    "key",
+    "signature_algorithm",
+    "serial",
+    "is_ca",
+    "self_signed"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-002",
+   "name": "tls.expiry_check",
+   "category": "TLS & SSL Inspection",
+   "description": "Days until certificate expiry; flags expired, not-yet-valid and expiring-soon certificates.",
+   "language": "python",
+   "input_schema": {
+    "pem": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "path": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "warn_days": {
+     "type": "int",
+     "required": false,
+     "default": 30
+    },
+    "now": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "days_left",
+    "expired",
+    "not_yet_valid",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-003",
+   "name": "tls.hostname_match",
+   "category": "TLS & SSL Inspection",
+   "description": "Check whether a hostname is covered by the certificate SAN (wildcards: one left-most label only).",
+   "language": "python",
+   "input_schema": {
+    "pem": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "path": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "hostname": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "matches",
+    "matched_entry",
+    "san",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-004",
+   "name": "tls.sigalg_check",
+   "category": "TLS & SSL Inspection",
+   "description": "Flag MD5/SHA-1 based certificate signatures.",
+   "language": "python",
+   "input_schema": {
+    "pem": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "path": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "algorithm",
+    "strength",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-005",
+   "name": "tls.key_strength",
+   "category": "TLS & SSL Inspection",
+   "description": "Evaluate public-key type and size (RSA bits / EC curve).",
+   "language": "python",
+   "input_schema": {
+    "pem": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "path": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "type",
+    "bits",
+    "curve",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-006",
+   "name": "tls.chain_analyze",
+   "category": "TLS & SSL Inspection",
+   "description": "Analyze a PEM bundle: leaf first, issuer-to-subject linkage, self-signed root, missing intermediates.",
+   "language": "python",
+   "input_schema": {
+    "pem": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "path": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "length",
+    "chain",
+    "linked",
+    "complete",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-007",
+   "name": "tls.live_handshake",
+   "category": "TLS & SSL Inspection",
+   "description": "Connect to host:port, report TLS version, cipher, verification result and certificate. Network tool: authorized=true.",
+   "language": "python",
+   "input_schema": {
+    "host": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "port": {
+     "type": "int",
+     "required": false,
+     "default": 443
+    },
+    "timeout": {
+     "type": "int",
+     "required": false,
+     "default": 5
+    },
+    "sni": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "protocol",
+    "cipher",
+    "verified",
+    "verify_error",
+    "certificate",
+    "pem",
+    "findings"
+   ],
+   "permission": "network",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-008",
+   "name": "tls.protocol_policy",
+   "category": "TLS & SSL Inspection",
+   "description": "Evaluate a negotiated protocol/cipher: legacy versions, CBC/RC4/3DES/NULL/EXPORT/anon, missing forward secrecy.",
+   "language": "python",
+   "input_schema": {
+    "protocol": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "cipher": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "acceptable",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-009",
+   "name": "tls.fingerprint",
+   "category": "TLS & SSL Inspection",
+   "description": "SHA-256/SHA-1/MD5 certificate fingerprints and SPKI SHA-256 (for pinning).",
+   "language": "python",
+   "input_schema": {
+    "pem": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "path": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "sha256",
+    "sha1",
+    "md5",
+    "spki_sha256"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "TLS-010",
+   "name": "tls.lifetime_check",
+   "category": "TLS & SSL Inspection",
+   "description": "Compare validity length with the 398-day public-CA limit (private CAs are exempt) and report age.",
+   "language": "python",
+   "input_schema": {
+    "pem": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "path": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    },
+    "now": {
+     "type": "str",
+     "required": false,
+     "default": ""
+    }
+   },
+   "output_schema": [
+    "lifetime_days",
+    "over_398",
+    "age_days",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-001",
+   "name": "url.normalize",
+   "category": "URL & Phishing Intelligence",
+   "description": "Normalize a URL: lowercase host, punycode, default ports, dot segments, percent-encoding case.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    },
+    "strip_fragment": {
+     "type": "bool",
+     "required": false,
+     "default": true
+    }
+   },
+   "output_schema": [
+    "normalized",
+    "host",
+    "changes"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-002",
+   "name": "url.parse_components",
+   "category": "URL & Phishing Intelligence",
+   "description": "Split a URL into scheme, userinfo, host parts, port, path, query pairs and fragment.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "scheme",
+    "host",
+    "registrable_domain",
+    "subdomain",
+    "tld",
+    "is_ip",
+    "port",
+    "path",
+    "query_params",
+    "fragment",
+    "userinfo"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-003",
+   "name": "url.shortener_detect",
+   "category": "URL & Phishing Intelligence",
+   "description": "Detect known URL-shortener hosts (destination is NOT resolved).",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-004",
+   "name": "url.suspicious_tld",
+   "category": "URL & Phishing Intelligence",
+   "description": "Flag top-level domains frequently abused in phishing (weak signal).",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings",
+    "tld"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-005",
+   "name": "url.ip_host_detect",
+   "category": "URL & Phishing Intelligence",
+   "description": "Detect IP-literal hosts and decimal/hex/octal obfuscated IPs and decode them.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings",
+    "decoded_ip"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-006",
+   "name": "url.userinfo_trick",
+   "category": "URL & Phishing Intelligence",
+   "description": "Detect 'trusted.com@evil.com' style userinfo deception.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings",
+    "real_host"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-007",
+   "name": "url.idn_homograph",
+   "category": "URL & Phishing Intelligence",
+   "description": "Detect punycode, mixed-script and brand-lookalike (homograph) hostnames.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings",
+    "scripts"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-008",
+   "name": "url.brand_impersonation",
+   "category": "URL & Phishing Intelligence",
+   "description": "Detect brand names or one/two-edit typosquats on non-official domains (built-in brand list).",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings",
+    "registrable_domain"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-009",
+   "name": "url.keyword_score",
+   "category": "URL & Phishing Intelligence",
+   "description": "Count credential/urgency keywords (English and Indonesian) in host, path and query.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings",
+    "keywords"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-010",
+   "name": "url.length_entropy",
+   "category": "URL & Phishing Intelligence",
+   "description": "Measure URL length and hostname randomness (Shannon entropy).",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings",
+    "length",
+    "host_entropy"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-011",
+   "name": "url.structure_check",
+   "category": "URL & Phishing Intelligence",
+   "description": "Check scheme, port, subdomain depth and hyphen patterns.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings",
+    "scheme",
+    "port"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-012",
+   "name": "url.redirect_params",
+   "category": "URL & Phishing Intelligence",
+   "description": "Find query parameters that embed another URL (open-redirect/phishing relay pattern).",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-013",
+   "name": "url.encoding_obfuscation",
+   "category": "URL & Phishing Intelligence",
+   "description": "Detect double encoding, encoded separators, control characters and backslash tricks.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "flagged",
+    "findings"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-014",
+   "name": "url.phishing_score",
+   "category": "URL & Phishing Intelligence",
+   "description": "Aggregate all URL heuristics into one 0-100 phishing-likelihood score. Heuristic only; not verified intelligence.",
+   "language": "python",
+   "input_schema": {
+    "url": {
+     "type": "str",
+     "required": true,
+     "default": null
+    }
+   },
+   "output_schema": [
+    "score",
+    "label",
+    "findings",
+    "disclaimer"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  },
+  {
+   "id": "URL-015",
+   "name": "url.batch_triage",
+   "category": "URL & Phishing Intelligence",
+   "description": "Rank a list of URLs by phishing score (max 500) so the riskiest are reviewed first.",
+   "language": "python",
+   "input_schema": {
+    "urls": {
+     "type": "list",
+     "required": true,
+     "default": null
+    },
+    "min_score": {
+     "type": "int",
+     "required": false,
+     "default": 0
+    }
+   },
+   "output_schema": [
+    "ranked",
+    "total",
+    "failed"
+   ],
+   "permission": "none",
+   "test_status": "passing",
+   "documentation_status": "documented"
+  }
+ ]
+}

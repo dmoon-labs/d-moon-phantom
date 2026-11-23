@@ -1,0 +1,13 @@
+require 'json'
+require 'open3'
+require 'fileutils'
+require 'rbconfig'
+
+require 'phantom/version'
+require 'phantom/config'
+require 'phantom/exec'
+require 'phantom/banner'
+require 'phantom/engine'
+require 'phantom/core'
+require 'phantom/workflows'
+require 'phantom/cli'
